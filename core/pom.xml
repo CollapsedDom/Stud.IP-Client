@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>de.danner_web.studip_client</groupId>
+		<artifactId>studip_client</artifactId>
+		<version>LATEST</version>
+	</parent>
+	<artifactId>core</artifactId>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>client</module>
+		<module>updater</module>
+		<module>coreplugins</module>
+	</modules>
+
+	<distributionManagement>
+		<repository>
+			<id>internal.repo</id>
+			<name>MyCo Internal Repository</name>
+			<url>file:///D:/studip_client</url>
+		</repository>
+	</distributionManagement>
+
+	<properties>
+		<project.mainpath>${project.parent.basedir}</project.mainpath>
+	</properties>
+
+	<build>
+		<plugins>
+
+			<!-- sign jars in general -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<phase>package</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>verify</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<storetype>${keystore.type}</storetype>
+					<keystore>${keystore.path}</keystore>
+					<alias>${keystore.alias}</alias>
+					<storepass>${keystore.store.password}</storepass>
+					<keypass>${keystore.key.password}</keypass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>de.danner_web.studip_client</groupId>
+		<artifactId>core</artifactId>
+		<version>LATEST</version>
+	</parent>
+	<groupId>de.danner_web.studip_client.core</groupId>
+	<artifactId>updater</artifactId>
+
+	<properties>
+		<!-- adjust main path -->
+		<project.mainpath>${project.parent.parent.basedir}</project.mainpath>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.danner_web.studip_client.core</groupId>
+			<artifactId>client</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+
+					<!-- copy publicCert and favicon from client -->
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.7</version>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}${file.separator}classes</outputDirectory>
+									<overwrite>true</overwrite>
+									<resources>
+										<resource>
+											<directory>..${file.separator}client${file.separator}src${file.separator}main${file.separator}resources</directory>
+											<includes>
+												<include>publicCert.cer</include>
+												<include>icons${file.separator}favicon.png</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- copy needed classes from client -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.9.1</version>
+						<executions>
+							<execution>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>..${file.separator}client${file.separator}src${file.separator}main${file.separator}java</source>
+										<!-- TODO: maybe create commons package with swing components and 
+											utils -->
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- make jar executable and add class path -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<version>2.6</version>
+						<configuration>
+							<finalName>updater</finalName>
+							<outputDirectory>${project.releasedir}</outputDirectory>
+							<archive>
+								<manifest>
+									<mainClass>de.danner_web.studip_client.UpdaterStarter</mainClass>
+								</manifest>
+							</archive>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

@@ -1,0 +1,315 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.danner_web.studip_client</groupId>
+	<artifactId>studip_client</artifactId>
+	<version>0.1.0</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>core</module>
+		<module>plugins</module>
+	</modules>
+
+	<!-- Default settings -->
+	<name>StudIP Client</name>
+	<url>http://studip-client.danner-web.de/</url>
+	<organization>
+		<name>danner-web.de</name>
+		<url>http://danner-web.de/</url>
+	</organization>
+	<scm>
+		<url>https://github.com/CollapsedDom/Stud.IP-Client</url>
+		<developerConnection>Dominik and Philipp Danner</developerConnection>
+	</scm>
+	<issueManagement>
+		<url>https://github.com/CollapsedDom/Stud.IP-Client/issues</url>
+	</issueManagement>
+
+	<!-- Special properties -->
+	<properties>
+		<project.mainpath>${project.basedir}</project.mainpath>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.builddir>${project.mainpath}${file.separator}build</project.builddir>
+		<project.workingdir>${project.mainpath}${file.separator}bin</project.workingdir>
+		<project.releasedir>${project.builddir}${file.separator}currentversion</project.releasedir>
+
+		<keystore.path>${project.mainpath}${file.separator}dev.keystore</keystore.path>
+		<keystore.type>JKS</keystore.type>
+		<keystore.alias>devkey</keystore.alias>
+		<keystore.password>development</keystore.password>
+		<keystore.store.password>${keystore.password}</keystore.store.password>
+		<keystore.key.password>${keystore.password}</keystore.key.password>
+	</properties>
+
+	<profiles>
+
+		<profile>
+			<id>setup</id>
+			<build>
+				<plugins>
+
+					<!-- create exe wrapper for updater.jar -->
+					<plugin>
+						<groupId>com.akathist.maven.plugins.launch4j</groupId>
+						<artifactId>launch4j-maven-plugin</artifactId>
+						<version>1.7.8</version>
+						<inherited>false</inherited>
+						<executions>
+							<execution>
+								<id>l4j</id>
+								<phase>package</phase>
+								<goals>
+									<goal>launch4j</goal>
+								</goals>
+								<configuration>
+									<dontWrapJar>true</dontWrapJar>
+									<headerType>gui</headerType>
+									<jar>updater.jar</jar>
+									<outfile>${project.builddir}${file.separator}StudIP Client.exe</outfile>
+									<errTitle></errTitle>
+									<cmdLine></cmdLine>
+									<chdir>.</chdir>
+									<priority>idle</priority>
+									<downloadUrl>http://java.com/download</downloadUrl>
+									<supportUrl></supportUrl>
+									<stayAlive>false</stayAlive>
+									<restartOnCrash>false</restartOnCrash>
+									<manifest></manifest>
+									<icon>${project.basedir}${file.separator}core${file.separator}installer${file.separator}studip.ico</icon>
+									<singleInstance>
+										<mutexName>StudIP - Client</mutexName>
+										<windowTitle></windowTitle>
+									</singleInstance>
+									<jre>
+										<path></path>
+										<bundledJre64Bit>false</bundledJre64Bit>
+										<bundledJreAsFallback>false</bundledJreAsFallback>
+										<minVersion>1.7.0</minVersion>
+										<maxVersion></maxVersion>
+										<jdkPreference>preferJre</jdkPreference>
+										<runtimeBits>64/32</runtimeBits>
+									</jre>
+									<versionInfo>
+										<fileVersion>1.0.0.0</fileVersion>
+										<txtFileVersion>stable</txtFileVersion>
+										<fileDescription>Stud.IP Client Launcher</fileDescription>
+										<copyright>Dominik und Philipp Danner</copyright>
+										<productVersion>1.0.0.0</productVersion>
+										<txtProductVersion>stable</txtProductVersion>
+										<productName>Stud.IP Client</productName>
+										<companyName></companyName>
+										<internalName>StudIP Client</internalName>
+										<originalFilename>StudIP Client.exe</originalFilename>
+									</versionInfo>
+									<messages>
+										<startupErr>An error occurred while starting the application.</startupErr>
+										<bundledJreErr>This application was configured to use a
+											bundled Java Runtime Environment but the runtime is missing
+											or corrupted.</bundledJreErr>
+										<jreVersionErr>This application requires a Java Runtime
+											Environment</jreVersionErr>
+										<launcherErr>The registry refers to a nonexistent Java Runtime
+											Environment installation or the runtime is corrupted.</launcherErr>
+										<instanceAlreadyExistsMsg>An application instance is already
+											running.</instanceAlreadyExistsMsg>
+									</messages>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- Build windows setup.exe -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.4.0</version>
+						<inherited>false</inherited>
+						<executions>
+							<execution>
+								<id>create-setup-exe</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<executable>iscc</executable>
+							<!-- optional -->
+							<workingDirectory>${project.mainpath}</workingDirectory>
+							<arguments>
+								<argument>core${file.separator}installer${file.separator}windows${file.separator}setup_script.iss</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+
+					<!-- create setup.tar.gz -->
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.5.3</version>
+						<inherited>false</inherited>
+						<executions>
+							<execution>
+								<id>create-install-tar-gz</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+
+								<configuration>
+									<descriptor>assembly_config_linux_install.xml</descriptor>
+									<finalName>install</finalName>
+									<appendAssemblyId>false</appendAssemblyId>
+									<outputDirectory>${project.builddir}</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+
+					<!-- create currentversion.jar -->
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.5.3</version>
+						<inherited>false</inherited>
+						<executions>
+							<execution>
+								<id>create-archive</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+
+								<configuration>
+									<descriptor>assembly_config_build_currentversion_jar.xml</descriptor>
+									<finalName>currentversion_signed</finalName>
+									<appendAssemblyId>false</appendAssemblyId>
+									<outputDirectory>${project.builddir}</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- sign currentversion.jar -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jarsigner-plugin</artifactId>
+						<version>1.4</version>
+						<inherited>false</inherited>
+						<executions>
+							<execution>
+								<id>sign-currentversion</id>
+								<phase>package</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>verify-currentversion</id>
+								<phase>package</phase>
+								<goals>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<archiveDirectory>${project.builddir}</archiveDirectory>
+							<includes>
+								<include>*.jar</include>
+							</includes>
+							<storetype>${keystore.type}</storetype>
+							<keystore>${keystore.path}</keystore>
+							<alias>${keystore.alias}</alias>
+							<storepass>${keystore.store.password}</storepass>
+							<keypass>${keystore.key.password}</keypass>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<!-- Default build -->
+	<build>
+		<plugins>
+
+			<!-- download source code in Eclipse, best practice -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+
+			<!-- Set compiler version -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+
+			<!-- clean build and bin folder -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<inherited>false</inherited>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${project.builddir}</directory>
+							<includes>
+                                <include>**/*</include>
+                            </includes>
+							<excludes>
+								<exclude>currentversion_signed.jar</exclude>
+								<exclude>setup.exe</exclude>
+								<exclude>install.tar.gz</exclude>
+							</excludes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+						<fileset>
+							<directory>${project.workingdir}</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>

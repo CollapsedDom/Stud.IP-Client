@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>de.danner_web.studip_client</groupId>
+		<artifactId>core</artifactId>
+		<version>LATEST</version>
+	</parent>
+	<groupId>de.danner_web.studip_client.core</groupId>
+	<artifactId>coreplugins</artifactId>
+	<packaging>pom</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>de.danner_web.studip_client.core</groupId>
+			<artifactId>client</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+	</dependencies>
+	<modules>
+		<module>file_downloader</module>
+		<module>news</module>
+	</modules>
+	<properties>
+		<project.mainpath>${project.parent.parent.basedir}</project.mainpath>
+	</properties>
+
+	<profiles>
+
+		<!-- default profile load all modules -->
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+
+					<!-- set output directory for jar file -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<version>2.6</version>
+						<configuration>
+							<finalName>${project.name}_${project.version}</finalName>
+							<outputDirectory>${project.releasedir}${file.separator}plugins${file.separator}${project.name}</outputDirectory>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+	</profiles>
+	<build>
+		<plugins>
+
+			<!-- set output directory for jar file -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<finalName>${project.name}</finalName>
+					<outputDirectory>${project.workingdir}/plugins/${project.name}</outputDirectory>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+</project>
