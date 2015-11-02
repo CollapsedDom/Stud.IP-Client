@@ -12,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 
 import javax.swing.JLabel;
@@ -91,10 +93,10 @@ public class AboutView extends JPanel {
 		legalText.setLineWrap(true);
 		legalText.setWrapStyleWord(true);
 		legalText.setMargin(new Insets(15, 15, 15, 15));
-
+		BufferedReader in = null;
 		try {
-			@SuppressWarnings("resource")
-			BufferedReader in = new BufferedReader(new FileReader(new File(ResourceLoader.getURL("LICENSE.txt").getFile())));
+			InputStream is = getClass().getResourceAsStream("/LICENSE.txt");
+			in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 			String line = in.readLine();
 			while (line != null) {
 				legalText.append(line + "\n");
@@ -102,6 +104,14 @@ public class AboutView extends JPanel {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 
 		JTextPane donatePane = new JTextPane();
