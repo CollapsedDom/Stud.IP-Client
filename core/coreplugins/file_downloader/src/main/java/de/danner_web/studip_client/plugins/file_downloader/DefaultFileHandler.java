@@ -44,7 +44,7 @@ public class DefaultFileHandler extends Observable {
 	private static Logger logger = LogManager
 			.getLogger(DefaultFileHandler.class);
 
-	private static final String FILE_NAME = ".database";
+	private static final String FILE_NAME = ".database.xml";
 	private static final String TREE_PATTERN = "studip-client-core/documenttree/";
 	private static final String SEMESTER_PATTERN = "studip-client-core/semesterlist/";
 
@@ -118,14 +118,16 @@ public class DefaultFileHandler extends Observable {
 					&& newDestination.listFiles().length == 0
 					&& newDestination.canWrite()) {
 				try {
-					Files.move(oldDestination.toPath(),
-							newDestination.toPath(),
+					Files.move(oldDestination.toPath(), newDestination.toPath(),
 							StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e) {
 					return false;
 				}
 
 				settings.put(FileDownloadPlugin.SYNC_FOLDER, path);
+				this.database = new File(
+						settings.get(FileDownloadPlugin.SYNC_FOLDER)
+								+ File.separator + FILE_NAME);
 				tree.updateFileSystem(path);
 
 				setChanged();
@@ -219,7 +221,8 @@ public class DefaultFileHandler extends Observable {
 		try {
 			response = con.get(pattern);
 		} catch (OAuthNotAuthorizedException | OAuthMessageSignerException
-				| OAuthExpectationFailedException | OAuthCommunicationException e) {
+				| OAuthExpectationFailedException
+				| OAuthCommunicationException e) {
 			throw new UpdateFailureException("RootNode");
 		}
 
@@ -266,7 +269,8 @@ public class DefaultFileHandler extends Observable {
 		try {
 			response = con.get(SEMESTER_PATTERN);
 		} catch (OAuthNotAuthorizedException | OAuthMessageSignerException
-				| OAuthExpectationFailedException | OAuthCommunicationException e) {
+				| OAuthExpectationFailedException
+				| OAuthCommunicationException e) {
 			throw new UpdateFailureException("RootNode");
 		}
 
@@ -353,8 +357,8 @@ public class DefaultFileHandler extends Observable {
 		 * 
 		 * Also check for missing files and requeue
 		 */
-		boolean success = this.tree.updateFileSystem(settings
-				.get(FileDownloadPlugin.SYNC_FOLDER));
+		boolean success = this.tree
+				.updateFileSystem(settings.get(FileDownloadPlugin.SYNC_FOLDER));
 		List<Leaf> list = this.tree.collectDocuments();
 
 		if (!saveData()) {
