@@ -6,11 +6,11 @@ import java.util.Collection;
 
 import de.danner_web.studip_client.data.OAuthServer;
 
-public class DefaultServers extends PluginInformation{
+public class DefaultServers_RENAME extends PluginInformation{
 
     private PluginInformation info;
     
-    public DefaultServers(PluginInformation info){
+    public DefaultServers_RENAME(PluginInformation info){
         this.info = info;
     }
     
