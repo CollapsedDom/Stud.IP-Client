@@ -8,6 +8,10 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
 
 import javax.swing.JLabel;
@@ -31,7 +35,7 @@ public class AboutView extends JPanel {
 	private static final long serialVersionUID = 3113818346708185964L;
 
 	private SettingsModel settings;
-	
+
 	private JPanel info;
 	private JScrollPane legal;
 
@@ -62,8 +66,7 @@ public class AboutView extends JPanel {
 		info.setBackground(Color.WHITE);
 
 		// Version number
-		version = new JLabel("version " + settings.getVersion(),
-				SwingConstants.CENTER);
+		version = new JLabel("version " + settings.getVersion(), SwingConstants.CENTER);
 
 		// Logo
 		this.logo = new JLabel("Client", SwingConstants.CENTER);
@@ -80,32 +83,38 @@ public class AboutView extends JPanel {
 		info.add(version, BorderLayout.PAGE_END);
 
 		// Legal panel
-		JTextArea legalText = new JTextArea(
-				"Der Stud.IP Client\n\n"
-						+ "Das Herunterladen neuer Vorlesungsfolien und Übungsblätter aus verschiedenen Veranstaltungen gehört bei vielen Studierenden zum Tagesablauf. Der Stud.IP Client bietet eine Plattform, welche diese Dateien schnell, automatisch und direkt auf den Desktoprechner des Studierenden lädt. Außerdem informiert der Client über neue, wichtige Ankündigungen. Aufgrund des flexiblen Designs der Anwendung, sind verschieden Erweiterungen, wie eine Reaktionsmöglichkeit auf Nachrichten oder Foreneinträge, denkbar. Die Stud.IP Client Anwendung bietet so eine optimierte Verteilung von Information und Lehrmaterial mit Stud.IP.\n"
-						+ "\n\n\n"
-						+ "Entwickler\n\n"
-						+ "Philipp Danner\n"
-						+ "Dominik Danner\n"
-						+ "unterstützt von den Entwicklern des InteLeC-Zentrums der Uni Passau");
+		JTextArea legalText = new JTextArea("Der Stud.IP Client\n\n"
+				+ "Das Herunterladen neuer Vorlesungsfolien und Übungsblätter aus verschiedenen Veranstaltungen gehört bei vielen Studierenden zum Tagesablauf. Der Stud.IP Client bietet eine Plattform, welche diese Dateien schnell, automatisch und direkt auf den Desktoprechner des Studierenden lädt. Außerdem informiert der Client über neue, wichtige Ankündigungen. Aufgrund des flexiblen Designs der Anwendung, sind verschieden Erweiterungen, wie eine Reaktionsmöglichkeit auf Nachrichten oder Foreneinträge, denkbar. Die Stud.IP Client Anwendung bietet so eine optimierte Verteilung von Information und Lehrmaterial mit Stud.IP.\n"
+				+ "\n\n\n" + "Entwickler\n\n" + "Philipp Danner\n" + "Dominik Danner\n"
+				+ "unterstützt von den Entwicklern des InteLeC-Zentrums der Uni Passau" + "\n\n\n" + "Lizenz:\n\n");
 		legalText.setEditable(false);
 		legalText.setLineWrap(true);
 		legalText.setWrapStyleWord(true);
 		legalText.setMargin(new Insets(15, 15, 15, 15));
 
+		try {
+			@SuppressWarnings("resource")
+			BufferedReader in = new BufferedReader(new FileReader(new File(ResourceLoader.getURL("LICENSE.txt").getFile())));
+			String line = in.readLine();
+			while (line != null) {
+				legalText.append(line + "\n");
+				line = in.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		JTextPane donatePane = new JTextPane();
 		donatePane.setContentType("text/html");
 		donatePane.setEditable(false);
-		donatePane
-				.setText("<img src='https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_LG.gif' alt='Spenden'>");
+		donatePane.setText("<img src='https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_LG.gif' alt='Spenden'>");
 		donatePane.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (Desktop.isDesktopSupported()) {
 					Desktop desktop = Desktop.getDesktop();
 					try {
-						desktop.browse(new URI(
-								"http://studip-client.danner-web.de/donate/"));
+						desktop.browse(new URI("http://studip-client.danner-web.de/donate/"));
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
