@@ -454,6 +454,9 @@ public class UpdateModel extends Observable {
         File[] files = source.toFile().listFiles();
         for (File file : files) {
             if (file.isDirectory()) {
+            	if(file.getName().equals("META-INF")){
+            		continue;
+            	}
                 File targetDir = new File(
                         target.toFile().getAbsolutePath() + File.separator + file.getName());
                 targetDir.mkdirs();

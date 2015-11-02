@@ -32,6 +32,11 @@ public class Starter {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            try {
+				Files.delete(updaterNew.toPath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
         }
         
         if (VersionUtil.compareVersions(oldVersion, CLIENT_VERSION) < 0) {

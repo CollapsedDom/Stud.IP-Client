@@ -71,6 +71,9 @@
 									<addClasspath>true</addClasspath>
 								</manifest>
 							</archive>
+							<excludes>
+								<exclude>**/*_RENAME.*</exclude>
+							</excludes>
 						</configuration>
 					</plugin>
 
