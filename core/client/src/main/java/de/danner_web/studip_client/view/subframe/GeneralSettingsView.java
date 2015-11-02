@@ -445,6 +445,7 @@ public class GeneralSettingsView extends JPanel implements Observer, DetachableV
         orientationSelection.setModel(orientationModel);
         orientationSelection.setSelectedItem(getKeyByValue(orientation, settings.getNotificationOrientation()));
 
+        lblAccountDelete.setText(getLocalized(ACCOUNT_DELETE_LABEL));
         deleteaccount.setText(getLocalized(ACCOUNT_DELETE));
 
     }
