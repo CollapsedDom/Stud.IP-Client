@@ -66,7 +66,7 @@ public abstract class Node implements Serializable {
 		if (input == null) {
 			return null;
 		} else {
-			return input.replaceAll(BAD_REGEX, "_");
+			return input.replaceAll(BAD_REGEX, "_").trim();
 		}
 	}
 
