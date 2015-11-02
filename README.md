@@ -12,6 +12,7 @@ Der "Run StudIP Client.launch" setzt das Java working directory des ausgeführte
 
 ##### Projekt Checkout (Eclipse)
 Genauere Infos finden Sie [hier](http://obscuredclarity.blogspot.de/2012/10/import-maven-git-project-into-eclipse.html).
+
 1. Im `Project Explorer` rechts Klick -> `Import`
 2. `Maven` -> `Check out Maven Projects from SCM` auswählen -> `next`
 3. Unten rechts m2e Marketplace Link anklicken und `m2e-egit` Connector installieren
