@@ -21,9 +21,10 @@ public class CourseNode extends InnerNode {
 
 	public String course_id;
 	public String course_nr;
+	public String course_type;
 	public String title;
 
-	@XmlElementWrapper(name="folders")
+	@XmlElementWrapper(name = "folders")
 	public List<FolderNode> folders = new LinkedList<FolderNode>();
 
 	/**
@@ -72,8 +73,7 @@ public class CourseNode extends InnerNode {
 					this.folders.add(folderNode);
 				} else {
 					// is save because of contains
-					final FolderNode modify = this.folders.get(this.folders
-							.indexOf(folderNode));
+					final FolderNode modify = this.folders.get(this.folders.indexOf(folderNode));
 					modify.update(folderNode);
 				}
 			}
@@ -90,8 +90,7 @@ public class CourseNode extends InnerNode {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((course_id == null) ? 0 : course_id.hashCode());
+		result = prime * result + ((course_id == null) ? 0 : course_id.hashCode());
 		return result;
 	}
 
@@ -114,8 +113,8 @@ public class CourseNode extends InnerNode {
 
 	@Override
 	public String getName() {
-		return super.getName() == null ? (replaceChars(course_nr) + " - " + replaceChars(title))
-				: super.getName();
+		return super.getName() == null ? (replaceChars(course_nr) + " - " + replaceChars(title)
+				+ (course_type == null ? "" : " (" + course_type + ")")) : super.getName();
 	}
 
 	@Override
