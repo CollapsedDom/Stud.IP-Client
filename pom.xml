@@ -8,6 +8,7 @@
 	<modules>
 		<module>core</module>
 		<module>plugins</module>
+		
 	</modules>
 
 	<!-- Default settings -->
@@ -278,6 +279,7 @@
                             </includes>
 							<excludes>
 								<exclude>currentversion_signed.jar</exclude>
+								<exclude>currentversion_signed.zip</exclude>
 								<exclude>setup.exe</exclude>
 								<exclude>install.tar.gz</exclude>
 							</excludes>

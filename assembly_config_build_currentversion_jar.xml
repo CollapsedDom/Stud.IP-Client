@@ -5,6 +5,7 @@
 	<id>bin</id>
 	<formats>
 		<format>jar</format>
+		<format>zip</format>
 	</formats>
 
 	<baseDirectory>/</baseDirectory>
