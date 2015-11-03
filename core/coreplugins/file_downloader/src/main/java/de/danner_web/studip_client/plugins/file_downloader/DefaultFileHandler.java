@@ -3,16 +3,11 @@ package de.danner_web.studip_client.plugins.file_downloader;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.DosFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
-import java.util.jar.Attributes;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -349,6 +344,9 @@ public class DefaultFileHandler extends Observable {
 		 * Also check for missing files and requeue
 		 */
 		boolean success = this.tree.updateFileSystem(settings.get(FileDownloadPlugin.SYNC_FOLDER));
+		if(!success){
+			logger.warn("Error in updateFileSystem.");
+		}
 		List<Leaf> list = this.tree.collectDocuments();
 
 		if (!saveData()) {
