@@ -9,12 +9,11 @@ import java.nio.file.Files;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import de.danner_web.studip_client.utils.OSValidationUtil;
 
 public class AutostartUtil {
 
 	private static Logger logger = LogManager.getLogger(AutostartUtil.class);
-
-	private static String OS = null;
 
 	// Windows specific
 	private static final String SHORTCUT_NAME = "StudIP Client.lnk";
@@ -27,30 +26,10 @@ public class AutostartUtil {
 
 	// Mac specific
 
-	private static String getOsName() {
-		if (OS == null) {
-			OS = System.getProperty("os.name");
-		}
-		return OS;
-	}
-
-	private static boolean isWindows() {
-		return getOsName().startsWith("Windows");
-	}
-
-	private static boolean isMac() {
-		// TODO Implement
-		return false;
-	}
-
-	private static boolean isLinux() {
-		return getOsName().startsWith("Linux");
-	}
-
 	public static boolean createAutoStartShortcut() {
 		String installFolder = System.getProperty("user.dir");
 		// Check OS
-		if (isLinux()) {
+		if (OSValidationUtil.isLinux()) {
 			// Check if sh File and desktop file are in the correct folder
 			File shScriptFile = new File(installFolder + "/" + SH_SCRIPT_NAME);
 			if (!shScriptFile.exists() || shScriptFile.isDirectory()) {
@@ -94,10 +73,10 @@ public class AutostartUtil {
 			}
 
 			return true;
-		} else if (isMac()) {
+		} else if (OSValidationUtil.isMac()) {
 			// TODO implement
 			return false;
-		} else if (isWindows()) {
+		} else if (OSValidationUtil.isWindows()) {
 			// Check if "Studip Client.exe" exists
 			File f = new File(installFolder + "/" + EXE_NAME);
 			if (!f.exists() || f.isDirectory()) {
@@ -150,7 +129,7 @@ public class AutostartUtil {
 
 	public static boolean deleteAutoStartShortcut() {
 		// Check OS
-		if (isLinux()) {
+		if (OSValidationUtil.isLinux()) {
 			// check if set to autostart
 			String userHome = System.getProperty("user.home");
 			File desktopPath = new File(userHome + File.separator
@@ -176,10 +155,10 @@ public class AutostartUtil {
 				return false;
 			}
 			return true;
-		} else if (isMac()) {
+		} else if (OSValidationUtil.isMac()) {
 			// TODO implement
 			return false;
-		} else if (isWindows()) {
+		} else if (OSValidationUtil.isWindows()) {
 
 			// Get startup folder
 			String result = "";

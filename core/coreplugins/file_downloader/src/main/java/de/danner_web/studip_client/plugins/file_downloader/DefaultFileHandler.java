@@ -3,11 +3,16 @@ package de.danner_web.studip_client.plugins.file_downloader;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.DosFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
+import java.util.jar.Attributes;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,6 +33,7 @@ import de.danner_web.studip_client.plugins.file_downloader.treeModel.Leaf;
 import de.danner_web.studip_client.plugins.file_downloader.treeModel.SemesterNode;
 import de.danner_web.studip_client.plugins.file_downloader.treeModel.TreeRootNode;
 import de.danner_web.studip_client.utils.JSONParserUtil;
+import de.danner_web.studip_client.utils.OSValidationUtil;
 import de.danner_web.studip_client.utils.oauth.OAuthConnector;
 
 /**
@@ -41,8 +47,7 @@ public class DefaultFileHandler extends Observable {
 	/**
 	 * Logger dieser Klasse.
 	 */
-	private static Logger logger = LogManager
-			.getLogger(DefaultFileHandler.class);
+	private static Logger logger = LogManager.getLogger(DefaultFileHandler.class);
 
 	private static final String FILE_NAME = ".database.xml";
 	private static final String TREE_PATTERN = "studip-client-core/documenttree/";
@@ -75,19 +80,16 @@ public class DefaultFileHandler extends Observable {
 	/**
 	 * Constructor for the DefaultFileHandler
 	 */
-	public DefaultFileHandler(Context context, OAuthConnector con,
-			PluginSettings settings) {
+	public DefaultFileHandler(Context context, OAuthConnector con, PluginSettings settings) {
 		this.context = context;
 		this.settings = settings;
 		// this.rootPath = settings.getSettings().get(ROOT_PATH);
 		this.loader = new FileDownloader(context, con, settings);
 		this.con = con;
 
-		File databaseFolder = new File(
-				settings.get(FileDownloadPlugin.SYNC_FOLDER));
+		File databaseFolder = new File(settings.get(FileDownloadPlugin.SYNC_FOLDER));
 		databaseFolder.mkdirs();
-		this.database = new File(settings.get(FileDownloadPlugin.SYNC_FOLDER)
-				+ File.separator + FILE_NAME);
+		this.database = new File(settings.get(FileDownloadPlugin.SYNC_FOLDER) + File.separator + FILE_NAME);
 		loadData();
 	}
 
@@ -109,25 +111,19 @@ public class DefaultFileHandler extends Observable {
 	public boolean changeDestination(String path) {
 		// TODO test
 		if (path != null) {
-			File oldDestination = new File(
-					settings.get(FileDownloadPlugin.SYNC_FOLDER));
+			File oldDestination = new File(settings.get(FileDownloadPlugin.SYNC_FOLDER));
 			File newDestination = new File(path);
 
 			newDestination.mkdirs();
-			if (newDestination.isDirectory()
-					&& newDestination.listFiles().length == 0
-					&& newDestination.canWrite()) {
+			if (newDestination.isDirectory() && newDestination.listFiles().length == 0 && newDestination.canWrite()) {
 				try {
-					Files.move(oldDestination.toPath(), newDestination.toPath(),
-							StandardCopyOption.REPLACE_EXISTING);
+					Files.move(oldDestination.toPath(), newDestination.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e) {
 					return false;
 				}
 
 				settings.put(FileDownloadPlugin.SYNC_FOLDER, path);
-				this.database = new File(
-						settings.get(FileDownloadPlugin.SYNC_FOLDER)
-								+ File.separator + FILE_NAME);
+				this.database = new File(settings.get(FileDownloadPlugin.SYNC_FOLDER) + File.separator + FILE_NAME);
 				tree.updateFileSystem(path);
 
 				setChanged();
@@ -144,6 +140,7 @@ public class DefaultFileHandler extends Observable {
 	 */
 	public synchronized boolean saveData() {
 		logger.entry();
+		setFileVisible(database);
 		if (!database.exists()) {
 			try {
 				database.createNewFile();
@@ -163,7 +160,7 @@ public class DefaultFileHandler extends Observable {
 			logger.warn("Could not save Metatree to xml File.");
 			return logger.exit(false);
 		}
-
+		setFileHidden(database);
 		return logger.exit(true);
 	}
 
@@ -176,6 +173,7 @@ public class DefaultFileHandler extends Observable {
 	 */
 	protected boolean loadData() {
 		logger.entry();
+		setFileVisible(database);
 		if (!database.exists()) {
 			try {
 				// If database does not exist -> save one default
@@ -198,6 +196,7 @@ public class DefaultFileHandler extends Observable {
 			logger.warn("Could not load Metatree -> generated a new one.");
 			tree = new TreeRootNode();
 		}
+		setFileHidden(database);
 		return logger.exit(true);
 	}
 
@@ -220,14 +219,12 @@ public class DefaultFileHandler extends Observable {
 		HttpURLConnection response = null;
 		try {
 			response = con.get(pattern);
-		} catch (OAuthNotAuthorizedException | OAuthMessageSignerException
-				| OAuthExpectationFailedException
+		} catch (OAuthNotAuthorizedException | OAuthMessageSignerException | OAuthExpectationFailedException
 				| OAuthCommunicationException e) {
 			throw new UpdateFailureException("RootNode");
 		}
 
-		List<SemesterNode> newSemesterList = JSONParserUtil.parse(response,
-				SemesterNode.class);
+		List<SemesterNode> newSemesterList = JSONParserUtil.parse(response, SemesterNode.class);
 		if (newSemesterList == null) {
 			throw new UpdateFailureException("Could not parse SemesterList");
 		}
@@ -268,14 +265,12 @@ public class DefaultFileHandler extends Observable {
 		HttpURLConnection response = null;
 		try {
 			response = con.get(SEMESTER_PATTERN);
-		} catch (OAuthNotAuthorizedException | OAuthMessageSignerException
-				| OAuthExpectationFailedException
+		} catch (OAuthNotAuthorizedException | OAuthMessageSignerException | OAuthExpectationFailedException
 				| OAuthCommunicationException e) {
 			throw new UpdateFailureException("RootNode");
 		}
 
-		List<SemesterNode> newSemesterList = JSONParserUtil.parse(response,
-				SemesterNode.class);
+		List<SemesterNode> newSemesterList = JSONParserUtil.parse(response, SemesterNode.class);
 		if (newSemesterList == null) {
 			throw new UpdateFailureException("Could not parse SemesterList");
 		}
@@ -289,18 +284,14 @@ public class DefaultFileHandler extends Observable {
 				response = null;
 				try {
 					response = con.get(getSemesterPattern(se.semester_id));
-				} catch (OAuthNotAuthorizedException
-						| OAuthMessageSignerException
-						| OAuthExpectationFailedException
+				} catch (OAuthNotAuthorizedException | OAuthMessageSignerException | OAuthExpectationFailedException
 						| OAuthCommunicationException e) {
 					throw new UpdateFailureException("RootNode");
 				}
 
-				List<SemesterNode> temp = JSONParserUtil.parse(response,
-						SemesterNode.class);
+				List<SemesterNode> temp = JSONParserUtil.parse(response, SemesterNode.class);
 				if (temp == null) {
-					throw new UpdateFailureException(
-							"Could not parse SemesterList");
+					throw new UpdateFailureException("Could not parse SemesterList");
 				}
 				activeSemesters.addAll(temp);
 			}
@@ -348,8 +339,8 @@ public class DefaultFileHandler extends Observable {
 		// merge trees
 		updateDatabaseSemesters();
 
-		context.appendHistory("Updated Meta Information from Server in "
-				+ (System.currentTimeMillis() - milis) + " ms.");
+		context.appendHistory(
+				"Updated Meta Information from Server in " + (System.currentTimeMillis() - milis) + " ms.");
 
 		/*
 		 * Create new Folders / collect new Files (Metadata) / hand over to
@@ -357,8 +348,7 @@ public class DefaultFileHandler extends Observable {
 		 * 
 		 * Also check for missing files and requeue
 		 */
-		boolean success = this.tree
-				.updateFileSystem(settings.get(FileDownloadPlugin.SYNC_FOLDER));
+		boolean success = this.tree.updateFileSystem(settings.get(FileDownloadPlugin.SYNC_FOLDER));
 		List<Leaf> list = this.tree.collectDocuments();
 
 		if (!saveData()) {
@@ -384,4 +374,23 @@ public class DefaultFileHandler extends Observable {
 		return loader;
 	}
 
+	private static void setFileHidden(File file) {
+		if (file != null && file.exists() && OSValidationUtil.isWindows()) {
+			try {
+				Files.setAttribute(file.toPath(), "dos:hidden", true);
+			} catch (IOException e) {
+				logger.warn("Error in hidding the file " + file.getAbsolutePath() + " on Windows.");
+			}
+		}
+	}
+	
+	private static void setFileVisible(File file) {
+		if (file != null && file.exists() && OSValidationUtil.isWindows()) {
+			try {
+				Files.setAttribute(file.toPath(), "dos:hidden", false);
+			} catch (IOException e) {
+				logger.warn("Error in hidding the file " + file.getAbsolutePath() + " on Windows.");
+			}
+		}
+	}
 }
