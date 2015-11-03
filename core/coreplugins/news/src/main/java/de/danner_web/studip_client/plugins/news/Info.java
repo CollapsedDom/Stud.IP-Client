@@ -25,7 +25,7 @@ public class Info extends PluginInformation {
 
 	@Override
 	public String getVersion() {
-		return "0.1 stable";
+		return "1.0";
 	}
 
 	@Override
