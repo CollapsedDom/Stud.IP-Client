@@ -44,7 +44,7 @@ public abstract class Node implements Serializable {
 	private String alternateName = null;
 	@XmlAttribute
 	private String groupName = null;
-
+	@XmlAttribute
 	protected String myPath;
 	@XmlTransient
 	protected Node father;

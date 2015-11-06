@@ -3,6 +3,7 @@ package de.danner_web.studip_client.plugins.file_downloader.treeModel;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -25,6 +26,7 @@ public class CourseNode extends InnerNode {
 	public String title;
 
 	@XmlElementWrapper(name = "folders")
+	@XmlElement(name = "folder")
 	public List<FolderNode> folders = new LinkedList<FolderNode>();
 
 	/**

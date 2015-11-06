@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -37,8 +38,10 @@ public class FolderNode extends InnerNode {
 	}
 
 	@XmlElementWrapper(name="subfolders")
+	@XmlElement(name = "subfolder")
 	public List<FolderNode> subfolders = new LinkedList<FolderNode>();
 	@XmlElementWrapper(name="files")
+	@XmlElement(name = "file")
 	public List<DocumentLeaf> files = new LinkedList<DocumentLeaf>();
 
 	/**

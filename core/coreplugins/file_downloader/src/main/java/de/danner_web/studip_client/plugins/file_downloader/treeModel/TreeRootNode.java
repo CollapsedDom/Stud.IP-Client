@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -19,9 +20,11 @@ public class TreeRootNode extends InnerNode {
 	private static final long serialVersionUID = -2398207662947619268L;
 
 	@XmlElementWrapper(name="semesters")
+	@XmlElement(name = "semester")
 	public LinkedList<SemesterNode> semesters = new LinkedList<SemesterNode>();
 
 	@XmlElementWrapper(name="groups")
+	@XmlElement(name = "group")
 	public LinkedList<GroupNode> groups = new LinkedList<GroupNode>();
 
 	/**
