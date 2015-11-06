@@ -46,8 +46,8 @@ public class UpdaterStarter {
         
         // Launch StudIP Client
         if (!model.isClientAppMissing()) {
-            //model.launchAndExit();
-        //} else {
+            model.launchAndExit();
+        } else {
             String err_text = "ERROR: Could not start Stud.IP Client because of missing Client Application.";
             System.err.println(err_text);
             JOptionPane.showMessageDialog(null, err_text, "ERROR", JOptionPane.ERROR_MESSAGE);

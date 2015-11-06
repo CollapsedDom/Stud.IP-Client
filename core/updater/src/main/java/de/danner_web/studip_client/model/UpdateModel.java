@@ -33,15 +33,6 @@ public class UpdateModel extends Observable {
     private int progress = 1;
     private String status = "";
     
-    private final static String updateURL() {
-        return "http://studip-client.danner-web.de/update.php";
-    }
-    
-    private final static String versionURL(String id, String version) {
-        return "http://studip-client.danner-web.de/update.php" + "?id=" + id + "&version="
-                + version;
-    }
-    
     /**
      * This Path points to the Location where the Client is installed
      */
@@ -122,7 +113,7 @@ public class UpdateModel extends Observable {
     public boolean isNewerVersionAvailable() {
         int responseCode = -1;
         try {
-            URL url = new URL(versionURL(id, version));
+            URL url = UpdateServer.versionURL(id, version);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             responseCode = connection.getResponseCode();
@@ -145,31 +136,16 @@ public class UpdateModel extends Observable {
         
         JarFile updateJar = null;
         
-        int responseCode;
-        HttpURLConnection connection = null;
-        
-        // Request information
-        responseCode = -1;
-        try {
-            URL url = new URL(updateURL());
-            connection = (HttpURLConnection) url.openConnection();
-            
-            connection.connect();
-            
-            responseCode = connection.getResponseCode();
-            
-        } catch (IOException e) {
-            return null;
-        }
+        InputStream is = UpdateServer.getCurrentVersionAsInputStream();
         
         // Only if code is 200 update is available
-        if (responseCode == 200) {
+        if (is != null) {
             
             /* Copy it to tmp File */
             try {
                 // Create tmp File and download File to it
                 Path tmpFile = Files.createTempFile(tmpDir, "update", ".jar");
-                Files.copy(connection.getInputStream(), tmpFile,
+                Files.copy(is, tmpFile,
                         StandardCopyOption.REPLACE_EXISTING);
                 updateJar = new JarFile(tmpFile.toFile());
             } catch (Exception e) {

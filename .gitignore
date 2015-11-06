@@ -6,3 +6,4 @@
 target/
 DefaultServers.java
 publicCert.cer
+UpdateServer.java

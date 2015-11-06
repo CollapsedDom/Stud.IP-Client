@@ -30,6 +30,8 @@ Nach einem erfolgreichen Checkout müssen noch folgende Dateien umbenannt werden
 
 - im Ordner: `/core/client/src/main/resources` die Datei `publicCert_RENAME.cer` zu `publicCert.cer`. Sie stellt das Zertifikat dar mit welchem der Updater die Updates und der Client die Core-Plugins verifiziert. Für Testzwecke ist ein passender Keystore zum mitgelieferen Zertifikat vorhanden (siehe Maven Build Script).
 
+- im Ordner: `/core/updater/src/main/java/de/danner_web/studip_client/model` die Datei `UpdateServer_RENAME.java` zu `UpdateServer.java`. Sie implementiert die Verbindung zu einem Updateserver. Die Beispieldatei (UpdateServer_RENAME.java) stellt die Datei currentversion_signed.jar aus dem build Ordner zur Verfügung.
+
 Der Updater ist standardmäßig auf unseren Server konfiguriert. Die Server-seitigen Update-Scripte werden vorraussichtlich nicht Open Source veröffenlticht.
 
 ##### Maven
