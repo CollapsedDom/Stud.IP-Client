@@ -70,28 +70,17 @@ public class UpdateModel extends Observable {
         
         clientLocation = (new File(System.getProperty("user.dir"))).toPath();
         clientApp = clientLocation + File.separator + "StudIP_Client.jar";
-        
-        try {
-            tmpDir = Files.createTempDirectory("StudIPSyncUpdaterTMP");
-            tmpDir.toFile().deleteOnExit();
-            extractedPath = (new File(
-                    tmpDir.toFile().getAbsolutePath() + File.separator + "extracted")).toPath();
-            extractedPath.toFile().deleteOnExit();
-        } catch (IOException e) {
-        }
     }
     
     private void extractPrefs() {
         // Insert default values
         this.autoUpdate = true;
         this.version = "0";
-        this.clientApp = "";
         this.id = "1";
-        
-        Preferences rootPref = Preferences.userNodeForPackage(Starter.class);
         
         // Load from prefs if possible
         try {
+            Preferences rootPref = Preferences.userNodeForPackage(Starter.class);
             String[] allKeys = rootPref.keys();
             
             for (String key : allKeys) {
@@ -114,6 +103,7 @@ public class UpdateModel extends Observable {
             }
             
         } catch (BackingStoreException e) {
+            System.out.println("No Prefs found for Stud.IP Client.");
         }
     }
     
@@ -146,8 +136,9 @@ public class UpdateModel extends Observable {
         return responseCode == 200;
     }
     
-    public boolean isFirstInstall() {
-        return !new File(clientApp).exists();
+    public boolean isClientAppMissing() {
+        File client = new File(clientApp);
+        return !(client.exists() && client.isFile());
     }
     
     private JarFile downloadUpdate() {
@@ -168,7 +159,6 @@ public class UpdateModel extends Observable {
             responseCode = connection.getResponseCode();
             
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
         
@@ -183,7 +173,6 @@ public class UpdateModel extends Observable {
                         StandardCopyOption.REPLACE_EXISTING);
                 updateJar = new JarFile(tmpFile.toFile());
             } catch (Exception e) {
-                e.printStackTrace();
                 return null;
             }
         }
@@ -484,9 +473,6 @@ public class UpdateModel extends Observable {
      * Restarts the StudIP Client.
      */
     public void launchAndExit() {
-        extractedPath.toFile().delete();
-        tmpDir.toFile().delete();
-        
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
                 // Start Updater
@@ -515,6 +501,15 @@ public class UpdateModel extends Observable {
      */
     public boolean updateClient() {
         
+        try {
+            tmpDir = Files.createTempDirectory("StudIPSyncUpdaterTMP");
+            tmpDir.toFile().deleteOnExit();
+            extractedPath = (new File(
+                    tmpDir.toFile().getAbsolutePath() + File.separator + "extracted")).toPath();
+            extractedPath.toFile().deleteOnExit();
+        } catch (IOException e) {
+        }
+        
         // Download new files
         status = "Downloading new files ...";
         progress = 25;
@@ -524,7 +519,10 @@ public class UpdateModel extends Observable {
         JarFile jar = downloadUpdate();
         
         if (jar == null) {
-            System.err.println("ERROR: Could not download the update jar.");
+            status = "ERROR: Could not download the update jar.";
+            System.err.println(status);
+            setChanged();
+            notifyObservers();
             return false;
         }
         
@@ -535,7 +533,10 @@ public class UpdateModel extends Observable {
         notifyObservers();
         
         if (!verifySignature(jar)) {
-            System.err.println("ERROR: The signature of the update is not valid or not trusted.");
+            status = "ERROR: The signature of the update is not valid or not trusted.";
+            System.err.println(status);
+            setChanged();
+            notifyObservers();
             return false;
         }
         
@@ -545,7 +546,10 @@ public class UpdateModel extends Observable {
         setChanged();
         notifyObservers();
         if (!extractAndCopyUpdate(jar)) {
-            System.err.println("ERROR: Extracting content and copying to install path failed.");
+            status = "ERROR: Extracting content and copying to install path failed.";
+            System.err.println(status);
+            setChanged();
+            notifyObservers();
             return false;
         }
         
@@ -553,6 +557,10 @@ public class UpdateModel extends Observable {
         progress = 100;
         setChanged();
         notifyObservers();
+        
+        // delete unused files
+        extractedPath.toFile().delete();
+        tmpDir.toFile().delete();
         
         return true;
     }

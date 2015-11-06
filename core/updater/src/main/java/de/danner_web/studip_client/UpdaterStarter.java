@@ -24,8 +24,7 @@ public class UpdaterStarter {
     public static void main(String args[]) {
         
         UpdateModel model = new UpdateModel();
-        
-        if (model.isFirstInstall()) {
+        if (model.isClientAppMissing()) {
             updateClient(model);
         } else if (model.isAutoUpdate()) {
             
@@ -46,14 +45,29 @@ public class UpdaterStarter {
         }
         
         // Launch StudIP Client
-        model.launchAndExit();
+        if (!model.isClientAppMissing()) {
+            //model.launchAndExit();
+        //} else {
+            String err_text = "ERROR: Could not start Stud.IP Client because of missing Client Application.";
+            System.err.println(err_text);
+            JOptionPane.showMessageDialog(null, err_text, "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     private static void updateClient(UpdateModel model) {
         
         // Build Gui and update the client
         UpdaterUI ui = new UpdaterUI(model);
-        model.updateClient();
+        boolean success = model.updateClient();
+        
+        // If update fails, wait 5 seconds and then close the UI.
+        if (!success) {
+            try {
+                // This is the main thread.
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+            }
+        }
         ui.close();
     }
 }
