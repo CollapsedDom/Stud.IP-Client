@@ -11,7 +11,6 @@ import java.util.Properties;
 import de.danner_web.studip_client.data.OAuthServer;
 import de.danner_web.studip_client.plugin.Plugin;
 import de.danner_web.studip_client.plugin.PluginInformation;
-import de.danner_web.studip_client.utils.ResourceLoader;
 
 /**
  * Info class for the news plugin. Needed routes on studip server: GET/PUT
@@ -31,7 +30,7 @@ public class Info extends PluginInformation {
 	public String getVersion() {
 		Properties prop = new Properties();
 		try {
-			InputStream resourceAsStream = ResourceLoader.getURL("version.properties").openStream();
+			InputStream resourceAsStream = Info.class.getClassLoader().getResource("version.properties").openStream();
 			prop.load(resourceAsStream);
 		} catch (IOException e) {
 			e.printStackTrace();
