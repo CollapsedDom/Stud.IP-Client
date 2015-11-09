@@ -4,6 +4,8 @@ import java.awt.AWTException;
 import java.awt.Image;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Properties;
@@ -39,17 +41,17 @@ public class ViewController implements NavigationListener {
 
 		boolean trayIcon = createTrayIcon();
 		if (!model.getSettingsModel().isHidden()) {
-		    navigateToPlugins();
+			navigateToPlugins();
 		} else {
 			if (!trayIcon) {
-			    navigateToPlugins();
+				navigateToPlugins();
 				// If no Tray Icon is set -> only minimize MainWindow
 				mainWindow.setExtendedState(JFrame.ICONIFIED);
 			}
 		}
 		new InfoController(model);
 	}
-	
+
 	/**
 	 * This method tries to create a TrayIcon
 	 * 
@@ -83,6 +85,14 @@ public class ViewController implements NavigationListener {
 				int trayIconWidth = new TrayIcon(image).getSize().width;
 				appTrayIcon = new TrayIcon(image.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH));
 				appTrayIcon.setPopupMenu(menu);
+				appTrayIcon.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						if (e.getClickCount() == 2) {
+							navigateToPlugins();
+						}
+					}
+				});
 
 				try {
 					SystemTray.getSystemTray().add(appTrayIcon);
