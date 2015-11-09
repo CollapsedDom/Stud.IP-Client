@@ -9,13 +9,6 @@
 	<groupId>de.danner_web.studip_client.core</groupId>
 	<artifactId>coreplugins</artifactId>
 	<packaging>pom</packaging>
-	<dependencies>
-		<dependency>
-			<groupId>de.danner_web.studip_client.core</groupId>
-			<artifactId>client</artifactId>
-			<version>0.1.0</version>
-		</dependency>
-	</dependencies>
 	<modules>
 		<module>file_downloader</module>
 		<module>news</module>
@@ -64,4 +57,11 @@
 
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+			<groupId>de.danner_web.studip_client.core</groupId>
+			<artifactId>client</artifactId>
+			<version>[0.1.0,)</version>
+		</dependency>
+	</dependencies>
 </project>

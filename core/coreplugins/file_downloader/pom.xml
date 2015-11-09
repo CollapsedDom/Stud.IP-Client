@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.danner_web.studip_client.core</groupId>
 		<artifactId>coreplugins</artifactId>
-		<version>LATEST</version>
+		<version>[0.1.0,)</version>
 	</parent>
 	<groupId>de.danner_web.studip_client.core.plugins</groupId>
 	<artifactId>file_downloader</artifactId>
