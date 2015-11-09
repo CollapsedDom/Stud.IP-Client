@@ -1,13 +1,17 @@
 package de.danner_web.studip_client.plugins.file_downloader;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Properties;
 
 import de.danner_web.studip_client.data.OAuthServer;
 import de.danner_web.studip_client.plugin.Plugin;
 import de.danner_web.studip_client.plugin.PluginInformation;
+import de.danner_web.studip_client.utils.ResourceLoader;
 
 /**
  * PluginInformation for the "Documenten Downloader".
@@ -24,7 +28,14 @@ public class Info extends PluginInformation {
 
 	@Override
 	public String getVersion() {
-		return "0.1 stable";
+		Properties prop = new Properties();
+		try {
+			InputStream resourceAsStream = ResourceLoader.getURL("version.properties").openStream();
+			prop.load(resourceAsStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return prop.getProperty("version");
 	}
 
 	@Override

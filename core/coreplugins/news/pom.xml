@@ -8,10 +8,19 @@
 	</parent>
 	<groupId>de.danner_web.studip_client.core.plugins</groupId>
 	<artifactId>news</artifactId>
+	<version>1.0.0</version>
 
 	<properties>
 		<!-- adjust main path -->
 		<project.mainpath>${project.parent.parent.parent.basedir}</project.mainpath>
 	</properties>
-	<version>1.0.0</version>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
 </project>

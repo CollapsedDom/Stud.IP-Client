@@ -1,13 +1,17 @@
 package de.danner_web.studip_client.plugins.news;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Properties;
 
 import de.danner_web.studip_client.data.OAuthServer;
 import de.danner_web.studip_client.plugin.Plugin;
 import de.danner_web.studip_client.plugin.PluginInformation;
+import de.danner_web.studip_client.utils.ResourceLoader;
 
 /**
  * Info class for the news plugin. Needed routes on studip server: GET/PUT
@@ -25,7 +29,14 @@ public class Info extends PluginInformation {
 
 	@Override
 	public String getVersion() {
-		return "1.0";
+		Properties prop = new Properties();
+		try {
+			InputStream resourceAsStream = ResourceLoader.getURL("version.properties").openStream();
+			prop.load(resourceAsStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return prop.getProperty("version");
 	}
 
 	@Override

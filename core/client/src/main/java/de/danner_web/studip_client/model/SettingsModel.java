@@ -65,7 +65,7 @@ public class SettingsModel extends Observable {
 		map.put(AUTOSTART, "true");
 		map.put(AUTOUPDATE, "true");
 		map.put(LOCALE, Locale.getDefault(Category.DISPLAY).getLanguage());
-		map.put(VERSION, Starter.CLIENT_VERSION);
+		map.put(VERSION, Starter.getClientVersion());
 		
 		map.put(NOTIFICATION_ENABLED, "true");
         map.put(NOTIFICATION_DELETE_TIME, "5");
