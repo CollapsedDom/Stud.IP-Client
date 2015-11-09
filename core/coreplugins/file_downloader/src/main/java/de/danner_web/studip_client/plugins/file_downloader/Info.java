@@ -29,8 +29,9 @@ public class Info extends PluginInformation {
 	public String getVersion() {
 		Properties prop = new Properties();
 		try {
-			InputStream resourceAsStream = Info.class.getClassLoader().getResource("version.properties").openStream();
+			InputStream resourceAsStream = Info.class.getResourceAsStream("/file_downloader_version.properties");
 			prop.load(resourceAsStream);
+			resourceAsStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

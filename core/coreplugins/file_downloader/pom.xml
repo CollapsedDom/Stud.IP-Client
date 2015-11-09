@@ -24,7 +24,7 @@
 			<resource>
 				<directory>src/main/resources</directory>
 				<includes>
-					<include>version.properties</include>
+					<include>file_downloader_version.properties</include>
 				</includes>
 				<filtering>true</filtering>
 			</resource>

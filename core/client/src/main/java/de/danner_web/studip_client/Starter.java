@@ -1,7 +1,6 @@
 package de.danner_web.studip_client;
 
 import de.danner_web.studip_client.model.SettingsModel;
-import de.danner_web.studip_client.utils.ResourceLoader;
 import de.danner_web.studip_client.utils.VersionUtil;
 
 import java.io.File;
@@ -26,7 +25,7 @@ public class Starter {
 	public static String getClientVersion() {
 		Properties prop = new Properties();
 		try {
-			InputStream resourceAsStream = ResourceLoader.getURL("version.properties").openStream();
+			InputStream resourceAsStream = Starter.class.getResourceAsStream("/version.properties");
 			prop.load(resourceAsStream);
 		} catch (IOException e) {
 			e.printStackTrace();
