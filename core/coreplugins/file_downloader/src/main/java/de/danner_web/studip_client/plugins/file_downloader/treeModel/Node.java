@@ -268,7 +268,7 @@ public abstract class Node implements Serializable {
 					// Rename File
 					success = shouldExist.renameTo(newFile);
 				} else {
-					success = true;
+					success = false; //FIXME: allow syncing of two different nodes on same level in same folder on file system
 				}
 			}
 		}
