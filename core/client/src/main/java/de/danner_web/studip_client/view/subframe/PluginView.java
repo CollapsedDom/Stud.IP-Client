@@ -20,6 +20,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -58,7 +59,8 @@ public class PluginView extends JPanel implements Observer {
 	private static final String DEACTIVATION_QUESTION = "de.danner_web.studip_client.view.subframe.PluginView.deactivateQuestion";
 
 	private ModernToggleButton pauseButton;
-	private ActionButton addButton, activateButton, settingsButton, deletButton;
+	private ActionButton addButton, activateButton, settingsButton,
+			deletButton;
 
 	private JList<PluginInformation> pluginList;
 	private DefaultListModel<PluginInformation> listModel;
@@ -142,7 +144,8 @@ public class PluginView extends JPanel implements Observer {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				PluginInformation info = pluginList.getSelectedValue();
-				if (info.hasSettingsGui() && pluginModel.getPlugins().contains(info)
+				if (info.hasSettingsGui()
+						&& pluginModel.getPlugins().contains(info)
 						&& pluginModel.isactivePlugin(info)) {
 					requestPause();
 					buildSettingsGui = true;
@@ -196,7 +199,8 @@ public class PluginView extends JPanel implements Observer {
 				activateButton.setEnabled(true);
 				if (pluginModel.isactivePlugin(pluginList.getSelectedValue())) {
 					activateButton.setActive(true);
-					settingsButton.setEnabled(pluginList.getSelectedValue().hasSettingsGui());
+					settingsButton.setEnabled(pluginList.getSelectedValue()
+							.hasSettingsGui());
 				} else {
 					settingsButton.setEnabled(false);
 					activateButton.setActive(false);
@@ -212,9 +216,10 @@ public class PluginView extends JPanel implements Observer {
 	}
 
 	private void showPluginSettings() {
-		
-		JPanel settingsView = pluginModel.getSettingsView(pluginList.getSelectedValue());
-		if(settingsView != null){
+
+		JPanel settingsView = pluginModel.getSettingsView(pluginList
+				.getSelectedValue());
+		if (settingsView != null) {
 			final SettingsDialog dialog = new SettingsDialog(settingsView);
 			dialog.addWindowListener(new WindowAdapter() {
 				@Override
@@ -235,18 +240,22 @@ public class PluginView extends JPanel implements Observer {
 			protected String doInBackground() throws Exception {
 				if (!requestRunning) {
 					requestRunning = true;
-					boolean success = pluginModel.removePlugin(pluginList.getSelectedValue());
+					boolean success = pluginModel.removePlugin(pluginList
+							.getSelectedValue());
 					if (!success)
-						logger.debug(
-								"Removing plugin: " + pluginList.getSelectedValue().getName() + " was not successful.");
+						logger.debug("Removing plugin: "
+								+ pluginList.getSelectedValue().getName()
+								+ " was not successful.");
 
 				}
 				return "done";
 			}
 		};
 		int input = JOptionPane.showConfirmDialog(this,
-				getLocalized(DELETE_QUESTION) + " " + pluginList.getSelectedValue().getName(),
-				getLocalized(DELETE_TITLE), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				getLocalized(DELETE_QUESTION) + " "
+						+ pluginList.getSelectedValue().getName(),
+				getLocalized(DELETE_TITLE), JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE);
 
 		// If set to delete
 		if (input == 0) {
@@ -263,9 +272,11 @@ public class PluginView extends JPanel implements Observer {
 			protected String doInBackground() throws Exception {
 				if (!requestRunning) {
 					requestRunning = true;
-					boolean success = pluginModel.authorizePlugin(pluginList.getSelectedValue());
+					boolean success = pluginModel.authorizePlugin(pluginList
+							.getSelectedValue());
 					if (!success)
-						logger.debug("Authorizing plugin: " + pluginList.getSelectedValue().getName()
+						logger.debug("Authorizing plugin: "
+								+ pluginList.getSelectedValue().getName()
 								+ " was not successful.");
 
 				}
@@ -285,9 +296,11 @@ public class PluginView extends JPanel implements Observer {
 			protected String doInBackground() throws Exception {
 				if (!requestRunning) {
 					requestRunning = true;
-					boolean success = pluginModel.deactivatePlugin(pluginList.getSelectedValue());
+					boolean success = pluginModel.deactivatePlugin(pluginList
+							.getSelectedValue());
 					if (!success)
-						logger.debug("Deactivating plugin: " + pluginList.getSelectedValue().getName()
+						logger.debug("Deactivating plugin: "
+								+ pluginList.getSelectedValue().getName()
 								+ " was not successful.");
 				}
 				return "done";
@@ -295,8 +308,10 @@ public class PluginView extends JPanel implements Observer {
 		};
 
 		int input = JOptionPane.showConfirmDialog(this,
-				getLocalized(DEACTIVATION_QUESTION) + " " + pluginList.getSelectedValue().getName(),
-				getLocalized(DEACTIVATION_TITLE), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				getLocalized(DEACTIVATION_QUESTION) + " "
+						+ pluginList.getSelectedValue().getName(),
+				getLocalized(DEACTIVATION_TITLE), JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE);
 
 		// If set to delete
 		if (input == 0) {
@@ -391,11 +406,18 @@ public class PluginView extends JPanel implements Observer {
 		if (o == pluginModel) {
 			requestRunning = false;
 			pauseButton.setSelected(pluginModel.isRunning());
-			activateButton.setActive(model.getPluginModel().isactivePlugin(pluginList.getSelectedValue()));
-			settingsButton.setEnabled(model.getPluginModel().isactivePlugin(pluginList.getSelectedValue()));
+			activateButton.setActive(model.getPluginModel().isactivePlugin(
+					pluginList.getSelectedValue()));
+			settingsButton.setEnabled(model.getPluginModel().isactivePlugin(
+					pluginList.getSelectedValue()));
 			if (buildSettingsGui) {
 				buildSettingsGui = false;
-				showPluginSettings();
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						showPluginSettings();
+					}
+				});
 			}
 
 			// update PluginList
@@ -404,8 +426,13 @@ public class PluginView extends JPanel implements Observer {
 				for (PluginInformation info : pluginModel.getPlugins()) {
 					listModel.addElement(info);
 				}
-				pluginList.setModel(listModel);
-				pluginList.invalidate();
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						pluginList.setModel(listModel);
+						pluginList.invalidate();
+					}
+				});
 			}
 		}
 		repaint();

@@ -144,9 +144,8 @@ public class DefaultFileHandler extends Observable {
 			}
 		}
 
-		JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(TreeRootNode.class);
+			JAXBContext jc = JAXBContext.newInstance(TreeRootNode.class);
 			// Save tree
 			Marshaller marshaller = jc.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -180,9 +179,8 @@ public class DefaultFileHandler extends Observable {
 			}
 		}
 
-		JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(TreeRootNode.class);
+			JAXBContext jc = JAXBContext.newInstance(TreeRootNode.class);
 			// Load tree from xml file
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			tree = (TreeRootNode) unmarshaller.unmarshal(database);
