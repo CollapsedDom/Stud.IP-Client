@@ -516,8 +516,13 @@ public class PluginModel extends Observable {
      */
     public boolean deleteDefaultServer() {
         logger.entry();
+        
+        List<PluginInformation> pluginsToDeactivate = new ArrayList<PluginInformation>();
+        for(PluginInformation info : activePlugins.keySet()){
+        	pluginsToDeactivate.add(info);
+        }
 
-        for (PluginInformation info : activePlugins.keySet()) {
+        for (PluginInformation info : pluginsToDeactivate) {
             deactivatePlugin(info);
         }
         oauthServerModel.deleteOAuthServer(null);
