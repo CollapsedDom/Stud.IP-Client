@@ -3,8 +3,12 @@ package de.danner_web.studip_client.plugins.file_downloader;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -112,8 +116,26 @@ public class DefaultFileHandler extends Observable {
 			newDestination.mkdirs();
 			if (newDestination.isDirectory() && newDestination.listFiles().length == 0 && newDestination.canWrite()) {
 				try {
-					Files.move(oldDestination.toPath(), newDestination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					// Copy Files to new folder
+					Files.copy(oldDestination.toPath(), newDestination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					
+					// delete old folder
+					Files.walkFileTree(oldDestination.toPath(), new SimpleFileVisitor<Path>() {
+						   @Override
+						   public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+							   Files.delete(file);
+							   return FileVisitResult.CONTINUE;
+						   }
+
+						   @Override
+						   public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+							   Files.delete(dir);
+							   return FileVisitResult.CONTINUE;
+						   }
+
+					   });
 				} catch (IOException e) {
+					e.printStackTrace();
 					return false;
 				}
 

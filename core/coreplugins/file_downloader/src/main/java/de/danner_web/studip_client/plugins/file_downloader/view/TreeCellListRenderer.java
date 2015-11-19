@@ -25,7 +25,9 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -73,7 +75,7 @@ class TreeCellListEditor extends AbstractCellEditor implements TreeCellEditor {
 
 	private boolean iconClicked = false;
 	private boolean nameChanged = false;
-	
+
 	private Node node;
 
 	/*
@@ -246,7 +248,11 @@ class TreeCellListEditor extends AbstractCellEditor implements TreeCellEditor {
 		// update name
 		if (nameChanged) {
 			if (!node.changeName(panel.getNameComponent().getText())) {
-				// TODO: show message that renaming is not allowed
+				JOptionPane
+						.showMessageDialog(null,
+								"Das umbenennen von \"" + node.getName() + "\" zu \""
+										+ panel.getNameComponent().getText() + "\" ist nicht erlaubt.",
+								"Umbenennen nicht erlaubt", JOptionPane.OK_OPTION);
 				name.setText(node.getName());
 			}
 			nameChanged = false;
@@ -286,7 +292,7 @@ class TreeCellListEditor extends AbstractCellEditor implements TreeCellEditor {
 			// int row = tree.getClosestRowForLocation(me.getX(), me.getY());
 			// Rectangle rect = tree.getRowBounds(row);
 			//
-			// // FIXME: dirty hack of me.getPont().getX() to decide if only
+			// // dirty hack of me.getPont().getX() to decide if only
 			// select
 			// // or edit
 			// if (me.getClickCount() > 1 || me.getPoint().getX() >
@@ -308,23 +314,23 @@ class CellPanel extends JPanel {
 	public JTextField name = new JTextField(20);
 
 	protected CellPanel() {
-		JPanel panelLeft = new JPanel();
-		panelLeft.setOpaque(false);
-		panelLeft.setLayout(new BorderLayout());
+		JPanel panelMain = new JPanel();
+		panelMain.setOpaque(false);
+		panelMain.setLayout(new BorderLayout());
 		name.setFont(UIManager.getFont("Tree.font"));
 		name.setBorder(null);
 		name.setOpaque(false);
 		name.setEditable(false);
 		icon.setBorder(new EmptyBorder(0, 0, 0, 5));
-		panelLeft.add(icon, BorderLayout.LINE_START);
-		panelLeft.add(name, BorderLayout.CENTER);
+		panelMain.add(icon, BorderLayout.LINE_START);
+		panelMain.add(name, BorderLayout.CENTER);
 
 		cbDownload.setOpaque(false);
 
 		this.setLayout(new BorderLayout());
 		this.setBorder(new EmptyBorder(5, 5, 5, 8));
 
-		this.add(panelLeft, BorderLayout.WEST);
+		this.add(panelMain, BorderLayout.CENTER);
 		this.add(cbDownload, BorderLayout.LINE_END);
 		setBackground(Color.WHITE);
 	}
