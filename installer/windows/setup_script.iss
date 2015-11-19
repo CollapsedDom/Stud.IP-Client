@@ -21,7 +21,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={userpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputDir=..\..\..\build
+OutputDir=..\..\build
 OutputBaseFilename=setup
 SetupIconFile=..\studip.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
@@ -38,8 +38,8 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\..\build\StudIP Client.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\..\build\currentversion\updater.jar"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\build\StudIP Client.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\build\currentversion\updater.jar"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

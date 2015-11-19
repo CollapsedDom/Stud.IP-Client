@@ -76,7 +76,7 @@
 									<stayAlive>false</stayAlive>
 									<restartOnCrash>false</restartOnCrash>
 									<manifest></manifest>
-									<icon>${project.basedir}${file.separator}core${file.separator}installer${file.separator}studip.ico</icon>
+									<icon>${project.basedir}${file.separator}installer${file.separator}studip.ico</icon>
 									<singleInstance>
 										<mutexName>StudIP - Client</mutexName>
 										<windowTitle></windowTitle>
@@ -139,12 +139,12 @@
 							<!-- optional -->
 							<workingDirectory>${project.mainpath}</workingDirectory>
 							<arguments>
-								<argument>core${file.separator}installer${file.separator}windows${file.separator}setup_script.iss</argument>
+								<argument>installer${file.separator}windows${file.separator}setup_script.iss</argument>
 							</arguments>
 						</configuration>
 					</plugin>
 
-					<!-- create setup.tar.gz -->
+					<!-- create linux installer .tar.gz -->
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.5.3</version>
@@ -158,8 +158,8 @@
 								</goals>
 
 								<configuration>
-									<descriptor>assembly_config_linux_install.xml</descriptor>
-									<finalName>install</finalName>
+									<descriptor>installer${file.separator}assembly_config_linux_install.xml</descriptor>
+									<finalName>install_linux</finalName>
 									<appendAssemblyId>false</appendAssemblyId>
 									<outputDirectory>${project.builddir}</outputDirectory>
 								</configuration>
@@ -189,7 +189,7 @@
 								</goals>
 
 								<configuration>
-									<descriptor>assembly_config_build_currentversion_jar.xml</descriptor>
+									<descriptor>assembly_config_build_currentversion.xml</descriptor>
 									<finalName>currentversion_signed</finalName>
 									<appendAssemblyId>false</appendAssemblyId>
 									<outputDirectory>${project.builddir}</outputDirectory>

@@ -20,7 +20,7 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}${file.separator}core${file.separator}installer${file.separator}linux</directory>
+            <directory>${project.basedir}${file.separator}installer${file.separator}linux</directory>
             <outputDirectory>.</outputDirectory>
             <includes>
                 <include>**/*</include>

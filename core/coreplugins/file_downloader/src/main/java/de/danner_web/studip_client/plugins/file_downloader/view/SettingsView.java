@@ -10,10 +10,10 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
@@ -35,7 +35,7 @@ import de.danner_web.studip_client.view.components.buttons.ModernButton;
  * @author Dominik Danner
  *
  */
-public class SettingsView extends JPanel implements Observer {
+public class SettingsView extends JPanel implements Observer, ActionListener {
 
 	/**
 	 * 
@@ -44,8 +44,9 @@ public class SettingsView extends JPanel implements Observer {
 
 	private DefaultFileHandler model;
 	private JTree tree;
-	private JTextField dir;
+	private JLabel dir;
 	private JButton saveDir;
+	private JFileChooser chooser;
 
 	/**
 	 * Constructor of the SettingsView
@@ -80,8 +81,8 @@ public class SettingsView extends JPanel implements Observer {
 		this.setLayout(new BorderLayout());
 		Dimension size = new Dimension(500, 500);
 		this.setMinimumSize(size);
-		this.setMaximumSize(size);
-		this.setPreferredSize(size);
+		// this.setMaximumSize(size);
+		// this.setPreferredSize(size);
 
 		// Directory selections panel
 		JPanel panelDir = new JPanel();
@@ -89,18 +90,12 @@ public class SettingsView extends JPanel implements Observer {
 		panelDir.setLayout(new BorderLayout());
 		panelDir.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-		panelDir.add(new JLabel("Sync Ordner"), BorderLayout.LINE_START);
-		saveDir = new ModernButton("Setzen");
-		saveDir.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				model.changeDestination(dir.getText());
-			}
-		});
-		dir = new JTextField(model.getDir());
+		panelDir.add(new JLabel("Download Ordner"), BorderLayout.LINE_START);
+		saveDir = new ModernButton("Ordner auswählen");
+		saveDir.addActionListener(this);
+		dir = new JLabel(model.getDir());
 		dir.setBorder(new LineBorder(Template.COLOR_LIGHT_GRAY));
-		dir.setPreferredSize(new Dimension(250, saveDir.getPreferredSize().height));
+		dir.setPreferredSize(new Dimension(230, saveDir.getPreferredSize().height));
 
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.WHITE);
@@ -135,6 +130,19 @@ public class SettingsView extends JPanel implements Observer {
 		this.add(scrollPane, BorderLayout.CENTER);
 
 		setVisible(true);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		chooser = new JFileChooser();
+		chooser.setCurrentDirectory(new java.io.File(model.getDir()));
+		chooser.setDialogTitle("Ordner auswählen");
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		chooser.setAcceptAllFileFilterUsed(false);
+
+		if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			model.changeDestination(chooser.getSelectedFile().toString());
+		}
 	}
 
 	@Override
