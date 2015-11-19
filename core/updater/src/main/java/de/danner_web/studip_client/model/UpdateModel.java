@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,6 +14,8 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -115,7 +118,7 @@ public class UpdateModel extends Observable {
 	public boolean isNewerVersionAvailable() {
 		int responseCode = -1;
 		try {
-			URL url = UpdateServer.versionURL(id, version);
+			URL url = UpdateServer.versionURL(getMD5(id), version);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.connect();
 			responseCode = connection.getResponseCode();
@@ -133,6 +136,23 @@ public class UpdateModel extends Observable {
 		File client = new File(clientApp);
 		return !(client.exists() && client.isFile());
 	}
+	
+	private static String getMD5(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(input.getBytes());
+            BigInteger number = new BigInteger(1, messageDigest);
+            String hashtext = number.toString(16);
+            // Now we need to zero pad it if you actually want the full 32 chars.
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+            return hashtext;
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 	private JarFile downloadUpdate() {
 
@@ -410,8 +430,6 @@ public class UpdateModel extends Observable {
 							e.printStackTrace();
 						}
 					}
-
-//					String version = (String) (c.getDeclaredField("CLIENT_VERSION")).get(new String());
 					return version;
 				} catch (Exception e) {
 					e.printStackTrace();
