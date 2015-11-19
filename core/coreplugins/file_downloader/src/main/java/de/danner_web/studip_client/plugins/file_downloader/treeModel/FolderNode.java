@@ -84,7 +84,7 @@ public class FolderNode extends InnerNode {
 	 */
 	public void update(FolderNode newFolderNode) {
 		// only update, if the given folder_id is the same
-		if (this.folder_id == newFolderNode.folder_id) {
+		if (this.equals(newFolderNode)) {
 			this.name = newFolderNode.name;
 			this.mkdate = newFolderNode.mkdate;
 			this.chdate = newFolderNode.chdate;

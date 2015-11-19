@@ -26,13 +26,11 @@ public class LoginModel extends Observable {
 
 	private OAuthServer selectedServer;
 	private OAuthConnector con;
-	private Collection<OAuthServer> servers;
 
 	private PluginInformation info;
 
 	LoginModel(PluginInformation info) {
 		this.info = info;
-		this.servers = info.getServerList();
 	}
 	
 	public OAuthConnector getOAuthConnector() {
@@ -56,7 +54,7 @@ public class LoginModel extends Observable {
 	}
 
 	public Collection<OAuthServer> getServers() {
-		return servers;
+		return info.getServerList();
 	}
 
 	public PluginInformation getPluginInformation() {

@@ -61,7 +61,7 @@ public class CourseNode extends InnerNode {
 	 */
 	public void update(CourseNode newCourseNode) {
 		// only update, if the given course_id is the same
-		if (this.course_id == newCourseNode.course_id) {
+		if (this.equals(newCourseNode)) {
 			this.course_nr = newCourseNode.course_nr;
 			this.title = newCourseNode.title;
 
