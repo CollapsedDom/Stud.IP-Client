@@ -84,6 +84,7 @@ public class LogView extends JPanel implements Observer, DetachableView {
 				}
 				logList.setModel(listModel);
 				logList.invalidate();
+				logList.ensureIndexIsVisible(model.getLogList().size() - 1);
 			}
 		}
 		repaint();
