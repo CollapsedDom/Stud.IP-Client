@@ -88,8 +88,7 @@ public class FileDownloader {
 	/**
 	 * Constructor for the Class.
 	 */
-	public FileDownloader(Context context, OAuthConnector con,
-			PluginSettings settings) {
+	public FileDownloader(Context context, OAuthConnector con, PluginSettings settings) {
 		logger.entry(context, con, settings);
 		this.context = context;
 		this.con = con;
@@ -100,16 +99,17 @@ public class FileDownloader {
 	}
 
 	/**
-	 * Adds the new List at the end of the toDownload list.
+	 * Adds the new List at the end of the toDownload list and starts the
+	 * Download thread.
 	 * 
 	 * @param list
 	 *            new elements
 	 * @throws InterruptedException
 	 */
-	public void addAll(List<Leaf> list) {
+	public void addAllAndStart(List<Leaf> list) {
 		logger.entry(list);
 		StringBuilder sb = new StringBuilder();
-		final List<DocumentLeaf> toBeAllowedToDownload = new LinkedList<DocumentLeaf>();
+		final List<Leaf> toBeAllowedToDownload = new LinkedList<Leaf>();
 
 		/**
 		 * Add new Items synchronized on the List, no Problems with transparent
@@ -121,14 +121,18 @@ public class FileDownloader {
 				for (Leaf leaf : list) {
 					if (!this.toDownload.contains(leaf)) {
 						if (leaf instanceof DocumentLeaf) {
-							if (((DocumentLeaf) leaf).isProtected()
-									&& !((DocumentLeaf) leaf)
-											.isDownloadAllowed()) {
-								sb.append(leaf.getName() + ", "
-										+ leaf.getAbsolutePath() + "\n");
-								toBeAllowedToDownload.add((DocumentLeaf) leaf);
+							DocumentLeaf dleaf = (DocumentLeaf) leaf;
+							/*
+							 * If file is not protected, add it to the download
+							 * queue, otherwise generate a user input message to
+							 * allow download.
+							 */
+							if (dleaf.isProtected() && !dleaf.isDownloadAllowed()) {
+								sb.append(leaf.getName() + ", " + leaf.getAbsolutePath() + "\n");
+								toBeAllowedToDownload.add(leaf);
+							} else {
+								this.toDownload.add((DocumentLeaf) leaf);
 							}
-							this.toDownload.add((DocumentLeaf) leaf);
 						} else {
 							// cast to possible other types
 						}
@@ -147,18 +151,22 @@ public class FileDownloader {
 				@Override
 				public void onClick(PluginMessage message) {
 					// Allow download for all files in List
-					for (DocumentLeaf l : toBeAllowedToDownload) {
-						l.setDownloadAllowed();
+					for (Leaf l : toBeAllowedToDownload) {
+						if (l instanceof DocumentLeaf) {
+							((DocumentLeaf) l).setDownloadAllowed();
+						}
 					}
+					FileDownloader.this.addAllAndStart(toBeAllowedToDownload);
 				}
 			};
-			context.appendPopup(new AcceptPluginMessage(
-					"Eine Datei ist urheberrechlich geschützt.",
+			context.appendPopup(new AcceptPluginMessage("Eine Datei ist urheberrechlich geschützt.",
 					"Folgende Dateien dürfen nur im Rahmen der Veranstaltungen verwendet werden,"
-							+ " jede weitere Verbreitung ist unzulässig! \n"
-							+ sb.toString(), null, protectedFileListener));
+							+ " jede weitere Verbreitung ist unzulässig! \n" + sb.toString(),
+					null, protectedFileListener));
 			logger.exit();
 		}
+
+		this.start();
 	}
 
 	/**
@@ -219,11 +227,9 @@ public class FileDownloader {
 					try {
 						if (!toDownload.isEmpty()) {
 							// remove and get first element in queue
-							final DocumentLeaf activeDownlaod = toDownload
-									.poll();
+							final DocumentLeaf activeDownlaod = toDownload.poll();
 							if (activeDownlaod.isDownloadActive()) {
-								if (activeDownlaod.isProtected()
-										&& !activeDownlaod.isDownloadAllowed()) {
+								if (activeDownlaod.isProtected() && !activeDownlaod.isDownloadAllowed()) {
 									// ignore file. Wait till next time will get
 									// queued and confirmed.
 								} else {
@@ -235,13 +241,9 @@ public class FileDownloader {
 
 										HttpURLConnection connection = null;
 										try {
-											connection = con
-													.put(setFileDownloaded(activeDownlaod.document_id));
-										} catch (
-												OAuthNotAuthorizedException
-												| OAuthMessageSignerException
-												| OAuthExpectationFailedException
-												| OAuthCommunicationException e) {
+											connection = con.put(setFileDownloaded(activeDownlaod.document_id));
+										} catch (OAuthNotAuthorizedException | OAuthMessageSignerException
+												| OAuthExpectationFailedException | OAuthCommunicationException e) {
 											e.printStackTrace();
 										}
 										try {
@@ -253,15 +255,12 @@ public class FileDownloader {
 										} catch (IOException e) {
 											e.printStackTrace();
 										}
-										context.appendHistory("Dokument "
-												+ activeDownlaod.filename
-												+ " erfolgreich nach "
-												+ activeDownlaod
-														.getAbsolutePath()
-												+ " heruntergeladen.");
+										context.appendHistory(
+												"Dokument " + activeDownlaod.filename + " erfolgreich nach "
+														+ activeDownlaod.getAbsolutePath() + " heruntergeladen.");
 									} else {
-										context.appendHistory("Fehler beim Download der Datei "
-												+ activeDownlaod.filename);
+										context.appendHistory(
+												"Fehler beim Download der Datei " + activeDownlaod.filename);
 									}
 								}
 							}
@@ -270,8 +269,7 @@ public class FileDownloader {
 
 								@Override
 								public void onClick(PluginMessage message) {
-									File file = new File(
-											settings.get(FileDownloadPlugin.SYNC_FOLDER));
+									File file = new File(settings.get(FileDownloadPlugin.SYNC_FOLDER));
 									Desktop desktop = Desktop.getDesktop();
 									try {
 										desktop.open(file);
@@ -279,9 +277,8 @@ public class FileDownloader {
 									}
 								}
 							};
-							context.appendPopup(new TextPluginMessage(
-									"Alle Dokumente erfolgreich heruntergeladen",
-									"", openWindow));
+							context.appendPopup(new TextPluginMessage("Alle Dokumente erfolgreich heruntergeladen", "",
+									openWindow));
 							running = false;
 						}
 					} finally {
@@ -305,8 +302,7 @@ public class FileDownloader {
 			/* Get Document */
 			try {
 				response = con.get(downloadPattern(fileLeaf.document_id));
-			} catch (OAuthNotAuthorizedException | OAuthMessageSignerException
-					| OAuthExpectationFailedException
+			} catch (OAuthNotAuthorizedException | OAuthMessageSignerException | OAuthExpectationFailedException
 					| OAuthCommunicationException e) {
 				// Connection not available
 				return logger.exit(false);
@@ -316,8 +312,7 @@ public class FileDownloader {
 			// Get Lock on FileLeaf (No data restructuring is possible)
 			synchronized (fileLeaf) {
 				File target;
-				String filePathAndName = fileLeaf.getPath() + File.separator
-						+ fileLeaf.getName();
+				String filePathAndName = fileLeaf.getPath() + File.separator + fileLeaf.getName();
 				target = new File(filePathAndName);
 
 				// Delete file if already there

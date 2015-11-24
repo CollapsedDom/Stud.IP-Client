@@ -378,8 +378,7 @@ public class DefaultFileHandler extends Observable {
 			notifyObservers(tree);
 
 			// hand over files to Downloader and start it
-			loader.addAll(list);
-			loader.start();
+			loader.addAllAndStart(list);
 		}
 
 		return logger.exit(list.size());
