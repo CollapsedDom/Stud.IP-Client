@@ -226,10 +226,10 @@ public class DefaultFileHandler extends Observable {
 	public void updateDatabaseTree() throws UpdateFailureException {
 
 		String pattern = TREE_PATTERN;
-		if (tree.semesters.isEmpty()) {
-			// new installation -> only load semester meta data
-			pattern = SEMESTER_PATTERN;
-		}
+//		if (tree.semesters.isEmpty()) {
+//			// new installation -> only load semester meta data
+//			pattern = SEMESTER_PATTERN;
+//		}
 
 		HttpURLConnection response = null;
 		try {
