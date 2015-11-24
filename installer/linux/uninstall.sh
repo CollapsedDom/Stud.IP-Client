@@ -1,10 +1,5 @@
 #!/bin/bash
-#
-# Check whether init.d or systemd is used and install the start script
-# edit path to the client starter script in the init scripts
-#
-# sudo needed!!!
-#
+
 CLIENT_PATH=~/.studip_client
 APPLICATION_NAME='StudIP_Client.jar'
 
@@ -14,29 +9,33 @@ if [ -d $CLIENT_PATH ]
     cd $CLIENT_PATH
 
     #shut down Client if running
-    echo "Shut down Client if running"
     PID=`ps -aux | grep [-]Dname=StudIP_Client | awk {'print $2'}`
-    if [[ "$PID" =~ "^[0-9]+$" ]]
+    echo $PID
+    if [[ $PID -gt 0 ]] # =~ "^[0-9]+$"
         then
+    	echo "Shut down Client"
         kill -HUP $PID
     fi
     
     if [ -f "StudIP_Client.jar" ]
     then
+	echo "Delete Java userPrefs"
         java -jar StudIP_Client.jar -d
     else
         echo "Could not delete Java userPrefs. Please delete manually from ~/.java/.userPrefs"
     fi
     
     # Remove Files
+    echo "Remove all Client Files"
     rm -R $CLIENT_PATH
+
 fi
 
 # Remove .desktop File from autostart folder
-echo "Remove Autostart Link"
-autostartfile="~/.config/autostart/studip_client.desktop"
-if [ -f "$autostartfile" ] 
+autostartfile=~/.config/autostart/studip_client.desktop
+if [ -f $autostartfile ] 
     then
+    echo "Remove Autostart Link"
     rm $autostartfile
 fi
 
