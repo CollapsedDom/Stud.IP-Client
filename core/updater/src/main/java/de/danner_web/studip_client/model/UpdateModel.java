@@ -4,13 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ProcessBuilder.Redirect;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -31,7 +27,6 @@ import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
 
 import de.danner_web.studip_client.Starter;
-import de.danner_web.studip_client.utils.VersionUtil;
 
 public class UpdateModel extends Observable {
 
@@ -136,23 +131,23 @@ public class UpdateModel extends Observable {
 		File client = new File(clientApp);
 		return !(client.exists() && client.isFile());
 	}
-	
+
 	private static String getMD5(String input) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(input.getBytes());
-            BigInteger number = new BigInteger(1, messageDigest);
-            String hashtext = number.toString(16);
-            // Now we need to zero pad it if you actually want the full 32 chars.
-            while (hashtext.length() < 32) {
-                hashtext = "0" + hashtext;
-            }
-            return hashtext;
-        }
-        catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] messageDigest = md.digest(input.getBytes());
+			BigInteger number = new BigInteger(1, messageDigest);
+			String hashtext = number.toString(16);
+			// Now we need to zero pad it if you actually want the full 32
+			// chars.
+			while (hashtext.length() < 32) {
+				hashtext = "0" + hashtext;
+			}
+			return hashtext;
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	private JarFile downloadUpdate() {
 
@@ -310,13 +305,11 @@ public class UpdateModel extends Observable {
 			e.printStackTrace();
 			return false;
 		}
-		if (verifyVersionNumber()) {
-			try {
-				moveDir(extractedPath, clientLocation);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
+		try {
+			moveDir(extractedPath, clientLocation);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}
@@ -340,104 +333,6 @@ public class UpdateModel extends Observable {
 				Files.copy(jar.getInputStream(entry), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			}
 		}
-	}
-
-	/**
-	 * Checks weather the given Update is a update or not.
-	 * 
-	 * Implicit check for data structure due to the JarFile StudIP_Sync.jar
-	 * 
-	 * @return true, if update.zip contains a new Version of StudIP_Sync.jar,
-	 *         otherwise false.
-	 */
-	private boolean verifyVersionNumber() {
-		// Get Version of the new Client
-		File newJar = new File(extractedPath + File.separator + "StudIP_Client.jar");
-		String newVersion = getVersion(newJar);
-
-		// Get Version of the old Client if installed
-		String oldVersion = "-1";
-		if (clientLocation != null) {
-			File oldJar = new File(clientLocation.toFile().getAbsolutePath() + File.separator + "StudIP_Client.jar");
-			oldVersion = getVersion(oldJar);
-		}
-
-		if (oldVersion == null) {
-			return true;
-		}
-		return VersionUtil.compareVersions(newVersion, oldVersion) > 0;
-	}
-
-	/**
-	 * Returns the Version of the JarFile.
-	 * 
-	 * Therefore the JarFile must be a StudIP_Sync.jar with a Starter.class in
-	 * it.
-	 * 
-	 * 
-	 * @param file
-	 * @return
-	 */
-	@SuppressWarnings("resource")
-	private String getVersion(File file) {
-		JarFile jarfile = null;
-		try {
-			jarfile = new JarFile(file);
-		} catch (IOException e) {
-			return null;
-		}
-
-		Enumeration<JarEntry> entry = jarfile.entries();
-
-		URL url = null;
-		try {
-			url = new URL("jar:file:" + file.getAbsolutePath() + "!/");
-		} catch (MalformedURLException e1) {
-			return null;
-		}
-
-		URL[] urls = { url };
-		URLClassLoader cl = URLClassLoader.newInstance(urls);
-
-		while (entry.hasMoreElements()) {
-			JarEntry je = (JarEntry) entry.nextElement();
-			if (!je.isDirectory() && je.getName().endsWith("Starter.class")) {
-				// -6 because of .class
-				String className = je.getName().substring(0, je.getName().length() - 6);
-				className = className.replace('/', '.');
-
-				Class<?> c;
-				try {
-					c = (Class<?>) cl.loadClass(className);
-					Method method = null;
-					String version = "";
-					try {
-						method = c.getMethod("getClientVersion");
-					} catch (SecurityException e) {
-						e.printStackTrace();
-					} catch (NoSuchMethodException e) {
-						e.printStackTrace();
-					}
-
-					if (method != null) {
-						try {
-							version = (String) method.invoke(null);
-						} catch (IllegalArgumentException e) {
-							e.printStackTrace();
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
-						}
-					}
-					return version;
-				} catch (Exception e) {
-					e.printStackTrace();
-					return null;
-				}
-			}
-		}
-		return null;
 	}
 
 	/**
